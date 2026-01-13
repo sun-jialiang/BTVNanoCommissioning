@@ -1,4 +1,3 @@
-import hist as Hist
 import awkward as ak
 from BTVNanoCommissioning.helpers.func import flatten
 from .hist_helpers import get_hist_collections, get_axes_collections
@@ -262,7 +261,7 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                     weight=weight,
                 )
             # Soft muon histograms
-            elif "soft_l" in histname and not "ptratio" in histname:
+            elif "soft_l" in histname and "ptratio" not in histname:
                 h.fill(
                     syst,
                     smflav,
@@ -299,6 +298,29 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                                 flatten(sel_jet[histname.replace(f"jet{i}_", "")]),
                                 weight=weight,
                             )
+                # fill positively tagged jets, negatively tagged jets, and inclusive jets, binned in pt
+                if histname.endswith("_postag_jet_pt") or histname.endswith(
+                    "_negtag_jet_pt"
+                ):
+                    h.fill(
+                        syst,
+                        flatten(pruned_ev[histname.replace("_pt", "")].flavor),
+                        flatten(pruned_ev[histname.replace("_pt", "")].pt),
+                        weight=flatten(
+                            ak.broadcast_arrays(
+                                weight, pruned_ev[histname.replace("_pt", "")].pt
+                            )[0]
+                        ),
+                    )
+                elif histname.endswith("jet_pt") and "AllSelJet" in pruned_ev.fields:
+                    h.fill(
+                        syst,
+                        flatten(pruned_ev["AllSelJet"].flavor),
+                        flatten(pruned_ev["AllSelJet"].pt),
+                        weight=flatten(
+                            ak.broadcast_arrays(weight, pruned_ev["AllSelJet"].pt)[0]
+                        ),
+                    )
             # Mu-jets distribution
             elif "lmujet_" in histname:
                 h.fill(
