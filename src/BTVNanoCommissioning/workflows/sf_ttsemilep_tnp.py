@@ -1,5 +1,5 @@
-import numpy as np
-import awkward as ak
+import collections
+import numpy as np, awkward as ak
 import hist as Hist
 from coffea import processor
 
@@ -11,6 +11,7 @@ from BTVNanoCommissioning.utils.correction import (
 )
 from BTVNanoCommissioning.helpers.func import update, dump_lumi
 from BTVNanoCommissioning.helpers.update_branch import missing_branch
+from BTVNanoCommissioning.utils.array_writer import array_writer
 from BTVNanoCommissioning.utils.selection import (
     HLT_helper,
     jet_id,
@@ -21,7 +22,7 @@ from BTVNanoCommissioning.utils.selection import (
     wp_dict,
 )
 
-from BTVNanoCommissioning.helpers.definitions import get_discriminators
+from BTVNanoCommissioning.helpers.definitions import get_discriminators, get_definitions
 
 
 def select_lepton(events, channel, campaign, iso_mode="tight"):
@@ -483,7 +484,7 @@ class NanoProcessor(processor.ProcessorABC):
                 ev = pruned_ev[rmask]
                 w = evt_w[rmask]
                 w_excl_btv = evt_w_excl_btv[rmask]
-                syst = np.full(len(w), syst)
+
                 # Selected electron histograms
                 if (
                     "ele" in ev.fields
