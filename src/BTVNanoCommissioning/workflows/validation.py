@@ -1,32 +1,26 @@
-import collections, awkward as ak, numpy as np
-import os
-import uproot
+import collections
 
-
+import awkward as ak
+import numpy as np
 from coffea import processor
-from coffea.analysis_tools import Weights
 
+from BTVNanoCommissioning.helpers.func import dump_lumi, flatten, update
+from BTVNanoCommissioning.helpers.update_branch import missing_branch
+from BTVNanoCommissioning.utils.array_writer import array_writer
 from BTVNanoCommissioning.utils.correction import (
+    common_shifts,
     load_lumi,
     load_SF,
     weight_manager,
-    common_shifts,
 )
-
-from BTVNanoCommissioning.helpers.func import update, dump_lumi, PFCand_link, flatten
-from BTVNanoCommissioning.helpers.update_branch import missing_branch
 from BTVNanoCommissioning.utils.histogramming.histogrammer import (
     histogrammer,
-    histo_writter,
 )
-from BTVNanoCommissioning.utils.array_writer import array_writer
 from BTVNanoCommissioning.utils.selection import (
     HLT_helper,
-    jet_id,
-    mu_idiso,
-    ele_mvatightid,
     btag_wp,
     btag_wp_dict,
+    jet_id,
 )
 
 
@@ -189,6 +183,7 @@ class NanoProcessor(processor.ProcessorABC):
                 if syst == "nominal" or syst == shift_name
                 else weights.weight(modifier=syst)
             )
+            syst = np.full(len(weight), syst)
             for histname, h in output.items():
                 if (
                     "Deep" in histname
@@ -315,7 +310,6 @@ class NanoProcessor(processor.ProcessorABC):
 
         # Output arrays
         if self.isArray:
-
             array_writer(
                 self, pruned_ev, events, weights, systematics, dataset, isRealData
             )
