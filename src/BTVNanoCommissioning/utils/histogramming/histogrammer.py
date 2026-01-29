@@ -151,8 +151,15 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                 and "btag" not in histname
                 and histname in pruned_ev.SelJet.fields
             ):
+                temp_weights = flatten(
+                    ak.broadcast_arrays(
+                        weights.partial_weight(exclude=exclude_btv),
+                        pruned_ev.SelJet["pt"],
+                    )[0]
+                )
+                temp_syst = np.full(len(temp_weights), syst[0])
                 h.fill(
-                    syst,
+                    temp_syst,
                     flatten(genflavor),
                     flatten(pruned_ev.SelJet[histname]),
                     weight=flatten(
