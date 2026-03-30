@@ -221,7 +221,9 @@ class NanoProcessor(processor.ProcessorABC):
         pruned_ev = events[event_level]
         pruned_ev["SelJet"] = event_jet[event_level]
         pruned_ev["AllSelJet"] = event_jet[event_level]  # untouched by histo_writter
-
+        # print("-----------------------")
+        # print(pruned_ev["Jet"].fields)
+        # print("-----------------------")
         for tagger, tag_obj in btag_wp_dict[f"{self._year}_{self._campaign}"].items():
             for stringency, wp in tag_obj["b"].items():
                 if stringency == "No":

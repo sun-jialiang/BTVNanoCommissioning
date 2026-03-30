@@ -42,7 +42,7 @@ def jet_id(events, campaign, max_eta=2.5, min_pt=20):
                 ),
             ),
         )
-    elif campaign in ["Winter24", "Summer24"]:
+    elif campaign in ["Winter24", "Summer24", "Winter25"]:
         # NanoV13 & NanoV14 & NanoV15
         barrel = (
             (events.Jet.neHEF < 0.99)
@@ -423,10 +423,30 @@ btag_wp_dict = {
             },
         },
     },
+    "2025_Winter25": {
+        "UParTAK4": {
+            "b": {
+                "No": 0.0,
+                "L": 0.0246,
+                "M": 0.1272,
+                "T": 0.4648,
+                "XT": 0.6298,
+                "XXT": 0.9739,
+            },
+            "c": {
+                "No": [0.0, 0.0],
+                "L": [0.086, 0.233],  # CvL, then CvB
+                "M": [0.291, 0.457],
+                "T": [0.650, 0.421],
+                "XT": [0.810, 0.736],
+            },
+        },
+    },
 }
 
 
-import os, correctionlib
+import os
+import correctionlib
 
 
 def wp_dict(year, campaign):
@@ -659,6 +679,26 @@ met_filters = {
         ],
     },
     "Summer24": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+        ],
+    },
+    "Winter25": {
         "data": [
             "goodVertices",
             "globalSuperTightHalo2016Filter",

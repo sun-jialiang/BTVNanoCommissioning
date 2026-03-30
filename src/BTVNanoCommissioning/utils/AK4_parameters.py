@@ -210,5 +210,33 @@ correction_config = {
             "SmearAndSyst",
         ],
     },
+    "Winter25": {
+        "DC": "Cert_Collisions2025_391658_398903_Golden.json",
+        "LUM": "puWeights2025.json.gz",
+        "JME": {
+            # TODO: JER are a placeholder for now (December 2025)
+            "MC": "Winter25Prompt25_V2 Summer23BPixPrompt23_RunD_JRV1",
+            "Run2025B": "Winter25Prompt25_V3",
+            "Run2025C": "Winter25Prompt25_V3",
+            "Run2025D": "Winter25Prompt25_V3",
+            "Run2025E": "Winter25Prompt25_V3",
+            "Run2025F": "Winter25Prompt25_V3",
+            # "Run2025G": "Winter25Prompt25_V3",
+        },
+        "jetveto": {"Winter25Prompt25_RunCDEFG_V1": "jetvetomap"},
+        "MUO": {
+            "mu_ID": "NUM_TightID_DEN_TrackerMuons",
+            "mu_Iso": "NUM_TightPFIso_DEN_TightID",
+        },
+        "EGM": {
+            "ele_Reco 2024 Electron-ID-SF": "",
+            "ele_ID 2024 Electron-ID-SF": "wp80iso",
+        },
+        "muonSS": "",
+        "electronSS": [
+            "Scale",
+            "SmearAndSyst",
+        ],
+    },
     "prompt_dataMC": {"DC": "$PROMPT_DATAMC"},
 }

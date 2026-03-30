@@ -430,15 +430,14 @@ def load_lumi(campaign):
     """
 
     _lumi_path = "BTVNanoCommissioning.data.DC"
-    if os.path.exists(
-        f'/cvmfs/cms-griddata.cern.ch/cat/metadata/DC/Collisions{campaign[-2:]}/config[campaign]["DC"]'
-    ):
-        return LumiMask(
-            f"/cvmfs/cms-griddata.cern.ch/cat/metadata/DC/Collisions{campaign[-2:]}/{config[campaign]['DC']}"
-        )
-    else:
-        with importlib.resources.path(_lumi_path, config[campaign]["DC"]) as filename:
-            return LumiMask(filename)
+    golden_json_file = (
+        f"/cvmfs/cms-griddata.cern.ch/cat/metadata/DC/Collisions{campaign[-2:]}/"
+        f"latest/{config[campaign]['DC']}"
+    )
+    if os.path.exists(golden_json_file):
+        return LumiMask(golden_json_file)
+    with importlib.resources.path(_lumi_path, config[campaign]["DC"]) as filename:
+        return LumiMask(filename)
 
 
 ## JEC
