@@ -17,11 +17,12 @@ from BTVNanoCommissioning.utils.correction import (
     reweighting,
 )
 from BTVNanoCommissioning.utils.selection import jet_cut, HLT_helper
+from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
 
 import correctionlib
 
 
-class NanoProcessor(processor.ProcessorABC):
+class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
     # Define histograms
     def __init__(
         self,

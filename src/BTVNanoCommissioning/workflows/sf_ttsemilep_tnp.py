@@ -25,6 +25,7 @@ from BTVNanoCommissioning.utils.selection import (
     btag_wp,
     wp_dict,
 )
+from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
 
 from BTVNanoCommissioning.helpers.definitions import get_discriminators, get_definitions
 
@@ -304,7 +305,7 @@ def sort_category(is_sig, cat_number: int):
         return ak.Array(np.full(n, "qcd", dtype="U5"))
 
 
-class NanoProcessor(processor.ProcessorABC):
+class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
     def __init__(
         self,
         year="2022",

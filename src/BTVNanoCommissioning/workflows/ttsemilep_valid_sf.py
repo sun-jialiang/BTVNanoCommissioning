@@ -26,9 +26,10 @@ from BTVNanoCommissioning.utils.selection import (
     btag_mu_idiso,
     MET_filters,
 )
+from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
 
 
-class NanoProcessor(processor.ProcessorABC):
+class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
     # Define histograms
     def __init__(
         self,

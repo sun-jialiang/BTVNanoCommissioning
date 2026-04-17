@@ -7,7 +7,7 @@ import time
 import numpy as np
 
 import uproot
-from coffea.util import load, save
+from coffea.util import save
 from coffea import processor
 from coffea.nanoevents import PFNanoAODSchema
 from BTVNanoCommissioning.workflows import workflows
@@ -25,7 +25,6 @@ def validate(file):
 def validate_dataset_structure(fileset, max_files_per_sample=None):
     """Check dataset files and return a filtered fileset with only valid files."""
     import uproot
-    import logging
     from copy import deepcopy
 
     if max_files_per_sample is not None and max_files_per_sample <= 0:
@@ -346,7 +345,7 @@ def scaleout_parser(parser):
         "--index",
         type=str,
         default="0,0",
-        help=f"(Specific for dask/lxplus file splitting, default: %(default)s)\n   Format: $dict_index_start,$file_index_start,$dict_index_stop,$file_index_stop. Stop indices are optional. $dict_index refers to the index, splitted $dict_index and $file_index with ','"
+        help="(Specific for dask/lxplus file splitting, default: %(default)s)\n   Format: $dict_index_start,$file_index_start,$dict_index_stop,$file_index_stop. Stop indices are optional. $dict_index refers to the index, splitted $dict_index and $file_index with ','"
         "$dict_index refers to the sample dictionary of the samples json file. $file_index refers to the N-th batch of files per dask-worker, with its size being defined by the option --index. The job will start (stop) submission from (with) the corresponding indices.",
     )
     return parser
@@ -423,7 +422,7 @@ if __name__ == "__main__":
         )
         outdir = f"{outdirprefix}arrays_{args.workflow}_{sample_json.rstrip('.json')}"
         coffeaoutput = (
-            f'{histoutdir}/hists_{args.workflow}_{(sample_json).rstrip(".json")}.coffea'
+            f"{histoutdir}/hists_{args.workflow}_{(sample_json).rstrip('.json')}.coffea"
         )
     if not args.noHist:
         os.system(f"mkdir -p {histoutdir}")
@@ -586,13 +585,13 @@ if __name__ == "__main__":
                 raise RuntimeError(
                     "x509 proxy could not be parsed, try creating it with 'voms-proxy-init'"
                 )
-            _x509_path = os.environ["HOME"] + f'/.{_x509_localpath.split("/")[-1]}'
+            _x509_path = os.environ["HOME"] + f"/.{_x509_localpath.split('/')[-1]}"
             os.system(f"cp {_x509_localpath} {_x509_path}")
 
         job_script_prologue = [
             "export XRD_RUNFORKHANDLER=1",
             f"export X509_USER_PROXY={_x509_path}",
-            f'export X509_CERT_DIR={os.environ["X509_CERT_DIR"]}',
+            f"export X509_CERT_DIR={os.environ['X509_CERT_DIR']}",
             f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
         ]
         pathvar = [i for i in os.environ["PATH"].split(":") if "envs/btv_coffea" in i][
@@ -600,7 +599,7 @@ if __name__ == "__main__":
         ]
         condor_extra = [
             f"export PATH={pathvar}:$PATH",
-            f'source {os.environ["HOME"]}/.bashrc',
+            f"source {os.environ['HOME']}/.bashrc",
         ]
         if "brux" in args.executor:
             job_script_prologue.append(f"cd {os.getcwd()}")
@@ -619,13 +618,13 @@ if __name__ == "__main__":
             if conda_available and mamba_available:
                 use_conda = True  # Set to False if you prefer Micromamba
                 if use_conda:
-                    condor_extra.append(f'conda activate {os.environ["CONDA_PREFIX"]}')
+                    condor_extra.append(f"conda activate {os.environ['CONDA_PREFIX']}")
                 else:
                     condor_extra.append(
                         f"micromamba activate {os.environ['CONDA_PREFIX']}"
                     )
             elif conda_available:
-                condor_extra.append(f'conda activate {os.environ["CONDA_PREFIX"]}')
+                condor_extra.append(f"conda activate {os.environ['CONDA_PREFIX']}")
             elif mamba_available:
                 condor_extra.append(f"micromamba activate {os.environ['CONDA_PREFIX']}")
             else:
@@ -734,8 +733,7 @@ if __name__ == "__main__":
                 ):
                     split_sample_dict[counter] = {
                         sample_name: files[
-                            ifile
-                            * args.condorFileSize : (ifile + 1)
+                            ifile * args.condorFileSize : (ifile + 1)
                             * args.condorFileSize
                         ]
                     }
@@ -792,7 +790,7 @@ if __name__ == "__main__":
 
     elif "parsl" in args.executor:
         import parsl
-        from parsl.providers import LocalProvider, CondorProvider, SlurmProvider
+        from parsl.providers import CondorProvider, SlurmProvider
         from parsl.channels import LocalChannel
         from parsl.config import Config
         from parsl.executors import HighThroughputExecutor
@@ -865,6 +863,7 @@ if __name__ == "__main__":
                         HighThroughputExecutor(
                             label="coffea_parsl_condor",
                             address=address_by_query(),
+                            prefetch_capacity=0,
                             max_workers=1,
                             worker_debug=True,
                             provider=CondorProvider(
@@ -889,6 +888,7 @@ if __name__ == "__main__":
                             HighThroughputExecutor(
                                 label="run",
                                 address=address_by_query(),
+                                prefetch_capacity=0,
                                 max_workers=1,
                                 worker_debug=True,
                                 provider=CondorProvider(
@@ -906,6 +906,7 @@ if __name__ == "__main__":
                             HighThroughputExecutor(
                                 label="merge",
                                 address=address_by_query(),
+                                prefetch_capacity=0,
                                 max_workers=1,
                                 worker_debug=True,
                                 provider=CondorProvider(
@@ -931,6 +932,7 @@ if __name__ == "__main__":
                         HighThroughputExecutor(
                             label="coffea_parsl_condor",
                             address=address_by_query(),
+                            prefetch_capacity=0,
                             max_workers=1,
                             provider=CondorProvider(
                                 nodes_per_block=1,
@@ -941,7 +943,7 @@ if __name__ == "__main__":
                                 worker_init="\n".join(
                                     job_script_prologue + condor_extra
                                 ),
-                                walltime="03:00:00",
+                                walltime="10:00:00",
                             ),
                         )
                     ],
@@ -953,6 +955,7 @@ if __name__ == "__main__":
                             HighThroughputExecutor(
                                 label="run",
                                 address=address_by_query(),
+                                prefetch_capacity=0,
                                 max_workers=1,
                                 provider=CondorProvider(
                                     nodes_per_block=1,
@@ -969,6 +972,7 @@ if __name__ == "__main__":
                             HighThroughputExecutor(
                                 label="merge",
                                 address=address_by_query(),
+                                prefetch_capacity=0,
                                 max_workers=1,
                                 provider=CondorProvider(
                                     nodes_per_block=1,
@@ -1165,7 +1169,7 @@ if __name__ == "__main__":
                                     ".coffea", f"_{sindex}_{findex}.coffea"
                                 ),
                             )
-    if not "lxplus" in args.executor:
+    if "lxplus" not in args.executor:
         if args.noHist == False:
             save(output, coffeaoutput)
     if args.noHist == False:

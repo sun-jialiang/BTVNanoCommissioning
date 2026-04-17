@@ -10,11 +10,12 @@ from BTVNanoCommissioning.helpers.BTA_helper import (
 )
 from BTVNanoCommissioning.helpers.func import update
 from BTVNanoCommissioning.utils.correction import load_SF, JME_shifts
+from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
 import os
 
 
 ## Based on coffea_array_producer.ipynb from Congqiao
-class NanoProcessor(processor.ProcessorABC):
+class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
     def __init__(
         self,
         year="2022",

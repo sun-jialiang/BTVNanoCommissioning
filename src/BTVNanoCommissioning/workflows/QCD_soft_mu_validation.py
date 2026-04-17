@@ -20,11 +20,12 @@ from BTVNanoCommissioning.utils.selection import (
     softmu_mask,
     HLT_helper,
 )
+from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
 
 import correctionlib
 
 
-class NanoProcessor(processor.ProcessorABC):
+class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
     # Define histograms
     def __init__(
         self,

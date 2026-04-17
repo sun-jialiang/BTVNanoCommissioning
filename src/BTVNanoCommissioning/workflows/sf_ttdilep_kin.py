@@ -55,6 +55,7 @@ from BTVNanoCommissioning.utils.selection import (
     mu_idiso,
     ele_cuttightid,
 )
+from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
 
 
 # ----------------------------
@@ -212,7 +213,7 @@ def run_bdt_inference(features, jetrank, bdt_event_hash, model_base):
 # ----------------------------
 # Processor definition
 # ----------------------------
-class NanoProcessor(processor.ProcessorABC):
+class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
     def __init__(
         self,
         year="2022",
