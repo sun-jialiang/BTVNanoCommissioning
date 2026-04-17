@@ -51,6 +51,7 @@ def jet_id(events, campaign, max_eta=2.5, min_pt=20):
         "Winter24",
         "Summer24",
         "Winter25",
+        "Prompt25",
     ]:
         # NanoV13+ / NanoV15 reprocessing (no jetId branch, compute from components)
         barrel = (
@@ -183,7 +184,7 @@ def jet_id(events, campaign, max_eta=2.5, min_pt=20):
 def ele_cuttightid(events, campaign):
     ele_etaSC = (
         events.Electron.eta + events.Electron.deltaEtaSC
-        if "Summer24" not in campaign
+        if campaign not in ["Summer24", "Winter25", "Prompt25"]
         else events.Electron.superclusterEta
     )
     elemask = (
@@ -195,7 +196,7 @@ def ele_cuttightid(events, campaign):
 def ele_mvatightid(events, campaign):
     ele_etaSC = (
         events.Electron.eta + events.Electron.deltaEtaSC
-        if "Summer24" not in campaign
+        if campaign not in ["Summer24", "Winter25", "Prompt25"]
         else events.Electron.superclusterEta
     )
     elemask = (
@@ -248,7 +249,8 @@ def jet_cut(events, campaign, ptmin=180, ptmax=1e5, absetamin=0, absetamax=2.5):
 def MET_filters(events, campaign):
     # apply MET filter
     metfilter = ak.ones_like(events.run, dtype=bool)
-    for flag in met_filters[campaign]["data" if "Run" else "mc"]:
+    isRealData = not hasattr(events, "genWeight")
+    for flag in met_filters[campaign]["data" if isRealData else "mc"]:
         metfilter = events.Flag[flag] & metfilter
     ## Flag_ecalBadCalibFilter
     badjet = (
@@ -282,6 +284,82 @@ def btag_wp(jets, year, campaign, tagger, borc, wp):
 
 
 btag_wp_dict = {
+    "2016_2016preVFP-UL": {
+        "UParTAK4": {
+            "b": {
+                "No": 0.0,
+                "L": 0.0387,
+                "M": 0.1847,
+                "T": 0.5467,
+                "XT": 0.6777,
+                "XXT": 0.9219,
+            },
+            "c": {  # placeholder
+                "No": [0.0, 0.0],
+                "L": [0.1, 0.1],  # CvL, then CvB
+                "M": [0.5, 0.5],
+                "T": [0.8, 0.8],
+                "XT": [0.9, 0.9],
+            },
+        },
+    },
+    "2016_2016postVFP-UL": {
+        "UParTAK4": {
+            "b": {
+                "No": 0.0,
+                "L": 0.0400,
+                "M": 0.1898,
+                "T": 0.5538,
+                "XT": 0.6872,
+                "XXT": 0.9353,
+            },
+            "c": {  # placeholder
+                "No": [0.0, 0.0],
+                "L": [0.1, 0.1],  # CvL, then CvB
+                "M": [0.5, 0.5],
+                "T": [0.8, 0.8],
+                "XT": [0.9, 0.9],
+            },
+        },
+    },
+    "2017_2017-UL": {
+        "UParTAK4": {
+            "b": {
+                "No": 0.0,
+                "L": 0.0331,
+                "M": 0.1776,
+                "T": 0.5755,
+                "XT": 0.7274,
+                "XXT": 0.9666,
+            },
+            "c": {  # placeholder
+                "No": [0.0, 0.0],
+                "L": [0.1, 0.1],  # CvL, then CvB
+                "M": [0.5, 0.5],
+                "T": [0.8, 0.8],
+                "XT": [0.9, 0.9],
+            },
+        },
+    },
+    "2018_2018-UL": {  # correct, the format is year_campaign
+        "UParTAK4": {
+            "b": {
+                "No": 0.0,
+                "L": 0.0308,
+                "M": 0.1610,
+                "T": 0.5405,
+                "XT": 0.6992,
+                "XXT": 0.9655,
+            },
+            "c": {  # placeholder
+                "No": [0.0, 0.0],
+                "L": [0.1, 0.1],  # CvL, then CvB
+                "M": [0.5, 0.5],
+                "T": [0.8, 0.8],
+                "XT": [0.9, 0.9],
+            },
+        },
+    },
     "2022_Summer22": {
         "DeepFlav": {
             "b": {
@@ -588,27 +666,7 @@ def wp_dict(year, campaign):
 
 
 met_filters = {
-    "2016preVFP_UL": {
-        "data": [
-            "goodVertices",
-            "globalSuperTightHalo2016Filter",
-            "HBHENoiseFilter",
-            "HBHENoiseIsoFilter",
-            "EcalDeadCellTriggerPrimitiveFilter",
-            "BadPFMuonFilter",
-            "eeBadScFilter",
-        ],
-        "mc": [
-            "goodVertices",
-            "globalSuperTightHalo2016Filter",
-            "HBHENoiseFilter",
-            "HBHENoiseIsoFilter",
-            "EcalDeadCellTriggerPrimitiveFilter",
-            "BadPFMuonFilter",
-            "eeBadScFilter",
-        ],
-    },
-    "2016postVFP_UL": {
+    "2016preVFP-UL": {
         "data": [
             "goodVertices",
             "globalSuperTightHalo2016Filter",
@@ -630,7 +688,29 @@ met_filters = {
             "eeBadScFilter",
         ],
     },
-    "2017_UL": {
+    "2016postVFP-UL": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "eeBadScFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "eeBadScFilter",
+        ],
+    },
+    "2017-UL": {
         "data": [
             "goodVertices",
             "globalSuperTightHalo2016Filter",
@@ -656,7 +736,7 @@ met_filters = {
             "ecalBadCalibFilter",
         ],
     },
-    "2018_UL": {
+    "2018-UL": {
         "data": [
             "goodVertices",
             "globalSuperTightHalo2016Filter",
@@ -771,6 +851,7 @@ met_filters = {
             "BadPFMuonDzFilter",
             "hfNoisyHitsFilter",
             "eeBadScFilter",
+            "ecalBadCalibFilter",
         ],
         "mc": [
             "goodVertices",
@@ -780,6 +861,73 @@ met_filters = {
             "BadPFMuonDzFilter",
             "hfNoisyHitsFilter",
             "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+    },
+    "Prompt25": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+    },
+    "Winter25": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+    },
+    "Prompt25": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
         ],
     },
     "Winter25": {
