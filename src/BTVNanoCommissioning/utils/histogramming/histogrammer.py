@@ -308,10 +308,6 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                                 weight, pruned_ev[histname.replace("_pt", "")].pt
                             )[0]
                         ),
-                        jet_syst,
-                        flatten(jet_col.flavor),
-                        flatten(jet_col.pt),
-                        weight=flatten(ak.broadcast_arrays(weight, jet_col.pt)[0]),
                     )
                 elif histname.endswith("jet_pt") and "AllSelJet" in pruned_ev.fields:
                     jet_syst = np.full(len(flatten(pruned_ev["AllSelJet"].pt)), syst[0])

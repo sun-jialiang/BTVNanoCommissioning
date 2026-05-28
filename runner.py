@@ -944,6 +944,7 @@ if __name__ == "__main__":
                                     job_script_prologue + condor_extra
                                 ),
                                 walltime="10:00:00",
+                                scheduler_options="+RequestRuntime = 36000\n",  # 10h in seconds
                             ),
                         )
                     ],
@@ -967,6 +968,7 @@ if __name__ == "__main__":
                                         job_script_prologue + condor_extra
                                     ),
                                     walltime="03:00:00",
+                                    scheduler_options="+RequestRuntime = 10800\n",  # 3h in seconds
                                 ),
                             ),
                             HighThroughputExecutor(
@@ -984,6 +986,7 @@ if __name__ == "__main__":
                                         job_script_prologue + condor_extra
                                     ),
                                     walltime="03:00:00",
+                                    scheduler_options="+RequestRuntime = 10800\n",  # 3h in seconds
                                 ),
                             ),
                         ],
@@ -1005,6 +1008,7 @@ if __name__ == "__main__":
                     "skipbadfiles": args.skipbadfiles,
                     "schema": PFNanoAODSchema,
                     "config": None,
+                    "tailtimeout": args.tailtimeout,
                 },
                 chunksize=args.chunk,
                 maxchunks=args.max,
@@ -1022,6 +1026,7 @@ if __name__ == "__main__":
                     "merges_executors": ["merge"],
                     "jobs_executors": ["run"],
                     "config": None,
+                    "tailtimeout": args.tailtimeout,
                 },
                 chunksize=args.chunk,
                 maxchunks=args.max,

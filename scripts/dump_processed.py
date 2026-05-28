@@ -3,6 +3,19 @@ import awkward as ak
 import numpy as np
 import sys, json, glob
 import os
+import re
+import subprocess
+
+
+def _extract_recorded_lumi(brilcalc_output):
+    summary_match = re.search(
+        r"#Summary:\s*.*?\n\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|",
+        brilcalc_output,
+        re.DOTALL,
+    )
+    if not summary_match:
+        return None
+    return float(summary_match.group(2))
 
 
 def dump_lumi(output, fname, year):
@@ -42,11 +55,30 @@ def dump_lumi(output, fname, year):
     else:
         print(f"WARNING: Unknown year '{year}', skipping brilcalc lumi calculation.")
         return
-    lumi_in_pb = os.popen(brilcalc_cmd).read()
-    lumi_in_pb = lumi_in_pb[
-        lumi_in_pb.find("#Summary:") : lumi_in_pb.find("#Check JSON:")
-    ]
-    lumi_in_pb = float(lumi_in_pb.split("\n")[4].split("|")[-2])
+
+    brilcalc_proc = subprocess.run(
+        ["bash", "-lc", f"shopt -s expand_aliases; {brilcalc_cmd}"],
+        capture_output=True,
+        text=True,
+    )
+    brilcalc_output = brilcalc_proc.stdout + brilcalc_proc.stderr
+    lumi_in_pb = _extract_recorded_lumi(brilcalc_output)
+
+    if lumi_in_pb is None:
+        message = [
+            f"Failed to parse brilcalc summary for year {year}.",
+        ]
+        if brilcalc_proc.returncode != 0:
+            message.append(f"brilcalc exited with code {brilcalc_proc.returncode}.")
+        if "Failed to find data table for the requested time range." in brilcalc_output:
+            message.append(
+                "The requested runs do not match the chosen year or normtag. "
+                "For Prompt25 data, rerun with '-y 2025'."
+            )
+        tail = "\n".join(brilcalc_output.strip().splitlines()[-10:])
+        if tail:
+            message.append("Last brilcalc lines:\n" + tail)
+        raise RuntimeError("\n".join(message))
 
     print(f"Luminosity in pb: {lumi_in_pb}")
 

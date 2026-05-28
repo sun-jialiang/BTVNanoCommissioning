@@ -30,7 +30,7 @@ from BTVNanoCommissioning.utils.selection import (
     ele_cuttightid,
     btag_wp,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):

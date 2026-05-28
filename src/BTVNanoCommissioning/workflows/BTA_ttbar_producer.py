@@ -10,7 +10,7 @@ from BTVNanoCommissioning.helpers.BTA_helper import (
 )
 from BTVNanoCommissioning.helpers.func import update
 from BTVNanoCommissioning.utils.correction import load_SF, JME_shifts
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 import os
 
 

@@ -26,7 +26,7 @@ from BTVNanoCommissioning.utils.selection import (
     btag_mu_idiso,
     MET_filters,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):

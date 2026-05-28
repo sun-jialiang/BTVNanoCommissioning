@@ -28,38 +28,38 @@ from BTVNanoCommissioning.utils.selection import (
     jet_id,
     mu_idiso,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
-_DY_ZPT_BIN_WIDTH = 5.0
-_DY_ZPT_BIN_COUNT = 60
-_DY_ZPT_REWEIGHT_FILE = "zpt_reweight_winter25_data_vs_summer24_mc_plotdatamc.json"
+# _DY_ZPT_BIN_WIDTH = 5.0
+# _DY_ZPT_BIN_COUNT = 60
+# _DY_ZPT_REWEIGHT_FILE = "zpt_reweight_winter25_data_vs_summer24_mc_plotdatamc.json"
 
 
-@lru_cache(maxsize=1)
-def _load_dy_zpt_reweight():
-    with (
-        importlib.resources.files("BTVNanoCommissioning.data")
-        .joinpath(_DY_ZPT_REWEIGHT_FILE)
-        .open("r", encoding="utf-8") as handle
-    ):
-        factors = np.asarray(json.load(handle), dtype=np.float64)
-    return factors
+# @lru_cache(maxsize=1)
+# def _load_dy_zpt_reweight():
+#     with (
+#         importlib.resources.files("BTVNanoCommissioning.data")
+#         .joinpath(_DY_ZPT_REWEIGHT_FILE)
+#         .open("r", encoding="utf-8") as handle
+#     ):
+#         factors = np.asarray(json.load(handle), dtype=np.float64)
+#     return factors
 
 
-def _dy_zpt_weight(dilep_pt):
-    zpt = ak.to_numpy(ak.fill_none(dilep_pt, np.nan))
-    weights = np.ones(len(zpt), dtype=np.float64)
-    finite = np.isfinite(zpt)
-    if not np.any(finite):
-        return weights
+# def _dy_zpt_weight(dilep_pt):
+#     zpt = ak.to_numpy(ak.fill_none(dilep_pt, np.nan))
+#     weights = np.ones(len(zpt), dtype=np.float64)
+#     finite = np.isfinite(zpt)
+#     if not np.any(finite):
+#         return weights
 
-    bin_idx = np.floor(zpt[finite] / _DY_ZPT_BIN_WIDTH).astype(np.int64)
-    in_range = (bin_idx >= 0) & (bin_idx < _DY_ZPT_BIN_COUNT)
-    if np.any(in_range):
-        finite_idx = np.nonzero(finite)[0]
-        weights[finite_idx[in_range]] = _load_dy_zpt_reweight()[bin_idx[in_range]]
-    return weights
+#     bin_idx = np.floor(zpt[finite] / _DY_ZPT_BIN_WIDTH).astype(np.int64)
+#     in_range = (bin_idx >= 0) & (bin_idx < _DY_ZPT_BIN_COUNT)
+#     if np.any(in_range):
+#         finite_idx = np.nonzero(finite)[0]
+#         weights[finite_idx[in_range]] = _load_dy_zpt_reweight()[bin_idx[in_range]]
+#     return weights
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
@@ -343,8 +343,9 @@ class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
         else:
             pruned_ev["AllSelJet", "flavor"] = flav[event_level]
 
-        # Find the PFCands associate with selected jets. Search from jetindex->JetPFCands->PFCand
-        if "PFCands" in events.fields:
+        # Link PFCands only when a downstream output actually consumes them.
+        needs_pfcands = self.isArray or any("PFCands" in key for key in output)
+        if needs_pfcands and "PFCands" in events.fields:
             pruned_ev["PFCands"] = PFCand_link(events, event_level, jetindx)
 
         ####################
@@ -352,8 +353,8 @@ class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
         ####################
         # Configure SFs
         weights = weight_manager(pruned_ev, self.SF_map, self.isSyst)
-        if not isRealData:
-            weights.add("DY_zpt_weight", _dy_zpt_weight(pruned_ev.dilep.pt))
+        # if not isRealData:
+        #     weights.add("DY_zpt_weight", _dy_zpt_weight(pruned_ev.dilep.pt))
         # Configure systematics
         if shift_name is None:
             systematics = ["nominal"] + list(weights.variations)

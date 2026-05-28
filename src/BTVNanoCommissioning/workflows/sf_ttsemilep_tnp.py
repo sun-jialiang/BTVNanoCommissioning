@@ -25,7 +25,7 @@ from BTVNanoCommissioning.utils.selection import (
     btag_wp,
     wp_dict,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 from BTVNanoCommissioning.helpers.definitions import get_discriminators, get_definitions
 

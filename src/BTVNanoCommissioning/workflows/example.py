@@ -34,7 +34,7 @@ from BTVNanoCommissioning.utils.selection import (
     mu_idiso,
     ele_cuttightid,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):

@@ -20,7 +20,7 @@ from BTVNanoCommissioning.utils.selection import (
     softmu_mask,
     HLT_helper,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 import correctionlib
 

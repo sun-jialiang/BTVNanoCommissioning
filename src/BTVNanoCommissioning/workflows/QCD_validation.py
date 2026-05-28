@@ -17,7 +17,7 @@ from BTVNanoCommissioning.utils.correction import (
     reweighting,
 )
 from BTVNanoCommissioning.utils.selection import jet_cut, HLT_helper
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 import correctionlib
 

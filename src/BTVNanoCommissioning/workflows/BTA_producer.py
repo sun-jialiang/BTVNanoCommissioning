@@ -19,7 +19,7 @@ from BTVNanoCommissioning.utils.correction import (
     JME_shifts,
     JPCalibHandler,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 ## Based on coffea_array_producer.ipynb from Congqiao

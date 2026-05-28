@@ -25,7 +25,7 @@ from BTVNanoCommissioning.utils.selection import (
     ele_mvatightid,
     softmu_mask,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):

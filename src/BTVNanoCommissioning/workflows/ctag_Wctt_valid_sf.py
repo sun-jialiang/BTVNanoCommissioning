@@ -24,7 +24,7 @@ from BTVNanoCommissioning.utils.selection import (
     btag_wp,
     btag_wp_dict,
 )
-from BTVNanoCommissioning.workflows.serializable import CorrectionCacheSerializableMixin
+from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
