@@ -1290,7 +1290,13 @@ class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
 
                 # Write immediately for this region
                 if not self.noHist:
-                    weights = weight_manager(pr, self.SF_map, self.isSyst)
+                    weights = weight_manager(
+                        pr,
+                        self.SF_map,
+                        self.isSyst,
+                        ttbar_reweights=getattr(self, "ttbar_reweights", "none"),
+                        campaign=self._campaign,
+                    )
                     systematics = (
                         [shift_name]
                         if shift_name is not None
