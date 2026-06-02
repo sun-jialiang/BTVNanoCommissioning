@@ -1,7 +1,3 @@
-import importlib.resources
-import json
-from functools import lru_cache
-
 import awkward as ak
 import numpy as np
 from coffea import processor
@@ -29,37 +25,6 @@ from BTVNanoCommissioning.utils.selection import (
     mu_idiso,
 )
 from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
-
-
-# _DY_ZPT_BIN_WIDTH = 5.0
-# _DY_ZPT_BIN_COUNT = 60
-# _DY_ZPT_REWEIGHT_FILE = "zpt_reweight_winter25_data_vs_summer24_mc_plotdatamc.json"
-
-
-# @lru_cache(maxsize=1)
-# def _load_dy_zpt_reweight():
-#     with (
-#         importlib.resources.files("BTVNanoCommissioning.data")
-#         .joinpath(_DY_ZPT_REWEIGHT_FILE)
-#         .open("r", encoding="utf-8") as handle
-#     ):
-#         factors = np.asarray(json.load(handle), dtype=np.float64)
-#     return factors
-
-
-# def _dy_zpt_weight(dilep_pt):
-#     zpt = ak.to_numpy(ak.fill_none(dilep_pt, np.nan))
-#     weights = np.ones(len(zpt), dtype=np.float64)
-#     finite = np.isfinite(zpt)
-#     if not np.any(finite):
-#         return weights
-
-#     bin_idx = np.floor(zpt[finite] / _DY_ZPT_BIN_WIDTH).astype(np.int64)
-#     in_range = (bin_idx >= 0) & (bin_idx < _DY_ZPT_BIN_COUNT)
-#     if np.any(in_range):
-#         finite_idx = np.nonzero(finite)[0]
-#         weights[finite_idx[in_range]] = _load_dy_zpt_reweight()[bin_idx[in_range]]
-#     return weights
 
 
 class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
@@ -287,35 +252,34 @@ class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
         # print(pruned_ev["Jet"].fields)
         # print("-----------------------")
         for tagger, tag_obj in btag_wp_dict[f"{self._year}_{self._campaign}"].items():
-            neg_branch = f"btagNeg{tagger}B"
-            if neg_branch not in event_jet.fields:
-                continue  # btagNeg* branches only exist in BTVNano
+            BNegScore = event_jet[f"btagNeg{tagger}B"]
+            # CvLNegScores exist but always -1 for Summer24 data and LO MC
+            CvBScore = event_jet[f"btag{tagger}CvB"]
+            CvBNegScore = event_jet[f"btagNeg{tagger}CvB"]
+            CvLNegScore = BNegScore * CvBNegScore / (1 - CvBNegScore)
             for stringency, wp in tag_obj["b"].items():
                 if stringency == "No":
                     continue
-                mask_postag = event_jet[f"btag{tagger}B"] > wp
-                mask_negtag = event_jet[neg_branch] > wp
-                postag_jet = event_jet[mask_postag][event_level]
+                mask_negtag = BNegScore > wp
                 negtag_jet = event_jet[mask_negtag][event_level]
-                key = f"{tagger}{stringency}"
-                pruned_ev[f"{key}_postag_jet"] = postag_jet
-                pruned_ev[f"{key}_negtag_jet"] = negtag_jet
-                if isRealData:
-                    pruned_ev[f"{key}_postag_jet", "flavor"] = ak.zeros_like(
-                        postag_jet.pt,
-                        dtype=int,
-                    )
-                    pruned_ev[f"{key}_negtag_jet", "flavor"] = ak.zeros_like(
-                        negtag_jet.pt,
-                        dtype=int,
-                    )
-                else:
-                    pruned_ev[f"{key}_postag_jet", "flavor"] = flav[mask_postag][
-                        event_level
-                    ]
-                    pruned_ev[f"{key}_negtag_jet", "flavor"] = flav[mask_negtag][
-                        event_level
-                    ]
+                pruned_ev[f"{tagger}{stringency}_negtag_jet"] = negtag_jet
+                data_flavor = ak.zeros_like(negtag_jet.pt, dtype=int)
+                pruned_ev[f"{tagger}{stringency}_negtag_jet", "flavor"] = (
+                    data_flavor if isRealData else flav[mask_negtag][event_level]
+                )
+            for stringency, wp in tag_obj["c"].items():
+                if stringency == "No":
+                    continue
+                mask_negtag = ak.all(
+                    [CvLNegScore > wp[0], CvBScore > wp[1]],
+                    axis=0,
+                )
+                negtag_jet = event_jet[mask_negtag][event_level]
+                pruned_ev[f"{tagger}{stringency}_negtag_jet_cWP"] = negtag_jet
+                data_flavor = ak.zeros_like(negtag_jet.pt, dtype=int)
+                pruned_ev[f"{tagger}{stringency}_negtag_jet_cWP", "flavor"] = (
+                    data_flavor if isRealData else flav[mask_negtag][event_level]
+                )
         if isMu:
             pruned_ev["MuonPlus"] = sposmu
             pruned_ev["MuonMinus"] = snegmu

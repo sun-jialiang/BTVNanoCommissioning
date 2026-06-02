@@ -122,9 +122,14 @@ def load_SF(year, campaign, selMod="default", syst=False):
                         f"/cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/{_lum_cvmfs}/latest/puWeights.json.gz"
                     )
                 except FileNotFoundError:
-                    correct_map["LUM"] = correctionlib.CorrectionSet.from_file(
-                        f"/cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/{_lum_cvmfs}/latest/puWeights_BCDEFGHI.json.gz"
-                    )
+                    try:
+                        correct_map["LUM"] = correctionlib.CorrectionSet.from_file(
+                            f"/cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/{_lum_cvmfs}/latest/puWeights_BCDEFGHI.json.gz"
+                        )
+                    except FileNotFoundError:
+                        correct_map["LUM"] = correctionlib.CorrectionSet.from_file(
+                            f"/cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/{_lum_cvmfs}/prelim/puWeights_2025pp_Golden_Summer24_25ns_69200ub.json.gz"
+                        )
             ## Otherwise custom files
             else:
                 _pu_path = f"BTVNanoCommissioning.data.LUM.{campaign}"
@@ -509,8 +514,7 @@ def load_lumi(campaign):
     FileNotFoundError: If the luminosity mask file does not exist.
     """
 
-    _lumi_path = f"/cvmfs/cms-griddata.cern.ch/cat/metadata/DC/Collisions{campaign[-2:]}/latest/{config[campaign]['DC']}"
-    _lumi_path = f'/cvmfs/cms-griddata.cern.ch/cat/metadata/DC/Collisions{campaign[-2:]}/latest/{config[campaign]["default"]["DC"]}'
+    _lumi_path = f"/cvmfs/cms-griddata.cern.ch/cat/metadata/DC/Collisions{campaign[-2:]}/latest/{config[campaign]['default']['DC']}"
     if os.path.exists(_lumi_path):
         return LumiMask(_lumi_path)
     else:
