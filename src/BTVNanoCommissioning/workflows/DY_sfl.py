@@ -24,7 +24,6 @@ from BTVNanoCommissioning.utils.selection import (
     jet_id,
     mu_idiso,
 )
-from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
 class NanoProcessor(processor.ProcessorABC):
