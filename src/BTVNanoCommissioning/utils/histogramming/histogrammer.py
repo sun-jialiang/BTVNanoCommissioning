@@ -136,7 +136,6 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
             else weights.weight(modifier=syst)
         )
         syst_perjet = syst
-        syst_perjet = syst
         syst = np.full(len(weight), syst)
         # Loop over the histograms
         for histname, h in output.items():
