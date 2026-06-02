@@ -27,7 +27,7 @@ from BTVNanoCommissioning.utils.selection import (
 from BTVNanoCommissioning.utils.serializable import CorrectionCacheSerializableMixin
 
 
-class NanoProcessor(CorrectionCacheSerializableMixin, processor.ProcessorABC):
+class NanoProcessor(processor.ProcessorABC):
     def __init__(
         self,
         year="2022",
